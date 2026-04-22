@@ -1,0 +1,74 @@
+research_job_task:
+  description: >
+    Find 1 active Software Engineer job openings in Pune. 
+    STRICT RULES:
+    1. Only provide direct job posting links from 'in.indeed.com' or 'naukri.com'.
+    2. DISCARD any LinkedIn links found, as they are blocked for the user.
+    3. Ensure the URLs are direct view pages (e.g., links containing '/viewjob' for Indeed 
+      or '/job-listings-' for Naukri).
+    4. DO NOT use ellipses (...) or shorten the URLs. You must provide the FULL, 
+      untruncated URL string.
+    5. If the search tool provides a shortened URL, keep searching until you find 
+      the direct, clickable job link.
+  expected_output: >
+    A list of 2 jobs from Indeed or Naukri. For each job, provide:
+    - JOB_TITLE: [Title]
+    - FULL_URL: [The complete, long URL from Indeed or Naukri]
+    - COMPANY: [Company Name]
+    - KEY_SKILLS: [extracted from snippet]
+  agent: job_researcher
+
+analyze_resume_task:
+  description: >
+    1. Use the 'read_resume' tool to read the user's resume at {resume_path}.
+    2. Review the job details and requirements provided in the context from the research_job_task.
+    3. Perform a deep comparison between the resume and the 2 job descriptions.
+    4. Generate a detailed ATS Compatibility Report for each job.
+  expected_output: >
+    A markdown report for each job including: 
+    - Job Title and URL
+    - Overall Compatibility Score (0-100%)
+    - List of Matching Skills
+    - Missing Skills or Gap Analysis
+  agent: resume_analyst
+  context:
+    - research_job_task
+
+outreach_task:
+  description: >
+    Review the Indeed/Naukri jobs found. 
+    1. Check the URLs: If they are identical, delete the duplicates.
+    2. Check the Titles: If a job is for 'VP', 'Manager', or 'Marketing', discard it.
+    3. Keep only roles matching 'Software Engineer' or 'Frontend'.
+  expected_output: "A clean, deduplicated list of 2 relevant Software Engineering jobs."
+  agent: outreach_specialist
+
+user_checkup_task:
+  description: >
+    1. Review the output from the analyze_resume_task. 
+    2. If jobs were found, send the 'Checkup Email' to {user_email}.
+    3. If NO jobs were found, send an email to {user_email} saying 'No matching 
+       roles found today' and stop.
+    4. Wait for 'yes' only if jobs were actually found.
+  expected_output: "Email sent to user regarding job status."
+  agent: automation_manager
+
+simulate_application_task:
+  description: >
+    For each job approved by the user, use the 'execute_job_application' tool.
+    This logs the job to the 'applied_jobs_tracker.csv' without real submission.
+  expected_output: "All jobs recorded in the application tracker."
+  agent: automation_manager
+  context:
+    - user_checkup_task
+    - research_job_task
+
+final_acknowledgement_task:
+  description: >
+    Send a final email to {user_email} stating: 
+    'Automation Complete: Your applications for [Jobs] have been simulated and logged.'
+    Provide a link to the 'applied_jobs_tracker.csv' for the user's reference.
+  expected_output: "Final confirmation email sent."
+  agent: automation_manager
+  context:
+    - simulate_application_task

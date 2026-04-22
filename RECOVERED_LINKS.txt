@@ -1,0 +1,8 @@
+https://in.linkedin.com/jobs/linkedin-software-engin...
+
+[2026-02-08 15:10:45][INFO]: Max RPM reached, waiting for next minute to start.
++-----------------------------------------------------------------[CrewAIEventsBus] Sync handler error in on_tool_usage_finished: 'charmap' codec can't encode character '\U0001f680' in position 1: character maps to 
+<undefined>
++-----------------------------------------------------------------[CrewAIEventsBus] Sync handler error in on_tool_usage_started: 'charmap' codec can't encode character '\U0001f680' in position 1: character maps to <undefined>
+Tool tavily_search executed with result: {
+  
