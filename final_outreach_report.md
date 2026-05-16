@@ -1,33 +1,15 @@
-Here is the clean, deduplicated list of relevant Software Engineering jobs based on your criteria:
+Based on the review, the provided job does not meet the criteria for a relevant match for a Frontend Developer profile.
 
-## ATS Compatibility Report: Indeed - Software Engineer
+Here's the breakdown:
 
-**Job Title:** Software Engineer
-**URL:** https://in.indeed.com/viewjob?jk=fb3c223b5fc39d89
-**Company:** Indeed
-**Key Skills:** Frontend and Backend technologies
+1.  **URL Check:** Not applicable as only one job was provided.
+2.  **Title Check (Discard):** The job title "Software Engineer III - Java AWS" does not contain 'VP', 'Manager', or 'Marketing'.
+3.  **Title Check (Keep):** The title contains 'Software Engineer'.
 
-**Overall Compatibility Score:** 60%
+However, as a Professional Career Assistant and final gatekeeper, my role is to ensure the user only applies to jobs that truly match their MCA background and Frontend skills. While the title contains "Software Engineer", the detailed ATS Compatibility Report clearly indicates a significant mismatch with the user's Frontend Web Developer skills, specifically requiring Java and AWS expertise for backend development. This role is not a true match for the user's Frontend specialization.
 
-**Matching Skills:**
+Therefore, this job has been discarded.
 
-*   **Frontend Technologies:**
-    *   JavaScript
-    *   React.js
-    *   TypeScript
-    *   Tailwind CSS
-    *   Redux Toolkit
-    *   Git
-    *   Jest (for testing frontend applications)
-    *   Experience with building responsive web applications and optimizing web performance (implied by "reducing load times and improving Core Web Vitals" and "optimizing dashboard performance")
-    *   Collaboration with UI/UX designers
+**Relevant Software Engineering Jobs:**
 
-**Missing Skills or Gap Analysis:**
-
-The primary gap is the explicit mention of "backend technologies." While the resume strongly highlights frontend expertise, there's no direct evidence or keyword usage indicating experience with backend development, databases, APIs, or server-side languages (e.g., Node.js, Python, Java, Go, etc.).
-
-*   **Backend Technologies:** The job description explicitly asks for both frontend and backend expertise. The resume currently only showcases strong frontend skills. To improve compatibility, Aditya should consider:
-    *   Adding any backend projects or experience, even if personal or academic, to the resume.
-    *   Including keywords related to backend frameworks (e.g., Node.js, Express.js, Django, Flask, Spring Boot), database technologies (e.g., SQL, MongoDB, PostgreSQL), and API development (e.g., RESTful APIs, GraphQL).
-    *   If applicable, rephrasing existing project descriptions to highlight any full-stack contributions, even if minor, such as "Developed and integrated RESTful APIs with frontend components."
-    *   Mentioning experience with cloud platforms (AWS, Azure, GCP) or containerization (Docker, Kubernetes) if applicable, as these are often associated with full-stack or backend roles.
+No relevant jobs were found from the provided context that align with the user's Frontend Developer profile.

@@ -30,14 +30,11 @@ outreach_specialist:
   role: >
     Professional Career Assistant & Outreach Specialist
   goal: >
-    Draft personalized job application emails and professional portal messages for the user 
-    when a high-quality match (>80% score) is found on Indeed or Naukri.
+    Review the ATS reports and select the top 2 best-matching jobs for the user.
   backstory: >
-    You are an expert in professional communication. You know exactly how to 
-    write a subject line that gets opened and a message that gets a response from recruiters 
-    on major Indian job boards. You act as a final gatekeeper, ensuring the user only 
-    applies to jobs that truly match their MCA background and Frontend skills, and 
-    that the links provided are fully functional and accessible.
+    You are an expert in professional communication. You act as a filter, ensuring 
+    the user applies to the most relevant jobs found. Even if the scores aren't perfect, 
+    you must ALWAYS provide the top 2 best options available from the search results.
   max_iter: 3
 
 automation_manager:

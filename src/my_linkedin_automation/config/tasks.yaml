@@ -11,7 +11,7 @@ research_job_task:
     5. If the search tool provides a shortened URL, keep searching until you find 
       the direct, clickable job link.
   expected_output: >
-    A list of 2 jobs from Indeed or Naukri. For each job, provide:
+    A list of exactly 2 jobs from Indeed or Naukri. For each job, provide:
     - JOB_TITLE: [Title]
     - FULL_URL: [The complete, long URL from Indeed or Naukri]
     - COMPANY: [Company Name]
@@ -48,7 +48,7 @@ user_checkup_task:
     1. Review the output from the analyze_resume_task. 
     2. If jobs were found, send the 'Checkup Email' to {user_email}.
     3. If NO jobs were found, send an email to {user_email} saying 'No matching 
-       roles found today' and stop.
+      roles found today' and stop.
     4. Wait for 'yes' only if jobs were actually found.
   expected_output: "Email sent to user regarding job status."
   agent: automation_manager
@@ -63,12 +63,3 @@ simulate_application_task:
     - user_checkup_task
     - research_job_task
 
-final_acknowledgement_task:
-  description: >
-    Send a final email to {user_email} stating: 
-    'Automation Complete: Your applications for [Jobs] have been simulated and logged.'
-    Provide a link to the 'applied_jobs_tracker.csv' for the user's reference.
-  expected_output: "Final confirmation email sent."
-  agent: automation_manager
-  context:
-    - simulate_application_task

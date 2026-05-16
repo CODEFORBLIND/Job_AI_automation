@@ -36,7 +36,7 @@ def untruncated_job_search(query: str):
     search_result = client.search(
         query=optimized_query,
         search_depth="advanced",
-        max_results=1 
+        max_results=5  
     )
 
     try:
@@ -53,7 +53,7 @@ def untruncated_job_search(query: str):
 def send_automation_email(to_email: str, subject: str, body: str):
     """Sends a professional automation update email to the user."""
     SENDER_EMAIL = "justforfunnn1901@gmail.com" 
-    APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD") # Fixed!
+    APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD") 
 
     if not APP_PASSWORD:
         return "FAILED: GMAIL_APP_PASSWORD is not set in the .env file."
@@ -75,19 +75,40 @@ def send_automation_email(to_email: str, subject: str, body: str):
 
 @tool("execute_job_application")
 def execute_job_application(job_title: str, company: str, job_url: str):
-    """SIMULATION TOOL: Records the application in the tracker database."""
+    """SIMULATION TOOL: Records the application in the tracker database, avoiding duplicates."""
+    import csv
+    import os
+    from datetime import datetime
+    
     print(f"--- 🛡️ SIMULATING APPLICATION: {job_title} at {company} ---")
     date_applied = datetime.now().strftime("%Y-%m-%d %H:%M")
     tracker_file = 'applied_jobs_tracker.csv'
     file_exists = os.path.isfile(tracker_file)
     
+    # 1. SMART DUPLICATE CHECK: Look inside the existing CSV first
+    if file_exists:
+        try:
+            with open(tracker_file, mode='r', encoding='utf-8') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    # If the URL is already in the file (column index 3), skip it!
+                    if len(row) > 3 and row[3] == job_url:
+                        print(f"⚠️ SKIP: Already applied to {job_url}")
+                        return f"SKIPPED: Application already exists in tracker."
+        except Exception as e:
+            print(f"Error reading tracker: {e}")
+
+    # 2. APPEND NEW ENTRY: Safely add the new job to the bottom of the file
     with open(tracker_file, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
+        # Only write the header if the file was just created
         if not file_exists:
             writer.writerow(['Date', 'Job Title', 'Company', 'URL', 'Status'])
+        
+        # Write the new job row
         writer.writerow([date_applied, job_title, company, job_url, "SIMULATED_SUCCESS"])
     
-    return f"VIRTUAL SUCCESS: Application logged in tracker."
+    return f"VIRTUAL SUCCESS: New application logged in tracker."
 
 @CrewBase
 class MyLinkedinAutomation():
@@ -167,13 +188,6 @@ class MyLinkedinAutomation():
         return Task(
             config=self.tasks_config['simulate_application_task'],
             context=[self.user_checkup_task(), self.research_job_task()]
-        )
-
-    @task
-    def final_acknowledgement_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['final_acknowledgement_task'],
-            context=[self.simulate_application_task()]
         )
 
     @crew
