@@ -36,7 +36,7 @@ def untruncated_job_search(query: str):
     search_result = client.search(
         query=optimized_query,
         search_depth="advanced",
-        max_results=5  
+        max_results=1
     )
 
     try:
@@ -74,41 +74,51 @@ def send_automation_email(to_email: str, subject: str, body: str):
         return f"FAILED to send email: {str(e)}"
 
 @tool("execute_job_application")
-def execute_job_application(job_title: str, company: str, job_url: str):
-    """SIMULATION TOOL: Records the application in the tracker database, avoiding duplicates."""
+def execute_job_application(job_title: str, company: str, job_url: str, location: str = "N/A", ats_score: str = "N/A"):
+    """SIMULATION TOOL: Records an individual job application into the tracker database, checking for duplicates."""
     import csv
     import os
     from datetime import datetime
     
-    print(f"--- 🛡️ SIMULATING APPLICATION: {job_title} at {company} ---")
+    print(f"\n--- 🛡️ SIMULATING APPLICATION: {job_title} at {company} ({location}) ---")
     date_applied = datetime.now().strftime("%Y-%m-%d %H:%M")
     tracker_file = 'applied_jobs_tracker.csv'
-    file_exists = os.path.isfile(tracker_file)
     
-    # 1. SMART DUPLICATE CHECK: Look inside the existing CSV first
-    if file_exists:
+    is_new_file = not os.path.exists(tracker_file)
+    
+    # 1. SMART DUPLICATE CHECK: Verify the unique URL hasn't been saved yet
+    if not is_new_file:
         try:
             with open(tracker_file, mode='r', encoding='utf-8') as file:
                 reader = csv.reader(file)
                 for row in reader:
-                    # If the URL is already in the file (column index 3), skip it!
+                    # Check column index 3 (URL) to avoid copying existing entries
                     if len(row) > 3 and row[3] == job_url:
-                        print(f"⚠️ SKIP: Already applied to {job_url}")
-                        return f"SKIPPED: Application already exists in tracker."
+                        print(f"⚠️ SKIP: Entry already exists for {job_url}")
+                        return f"SKIPPED: {job_title} at {company} is already in the database."
         except Exception as e:
             print(f"Error reading tracker: {e}")
 
-    # 2. APPEND NEW ENTRY: Safely add the new job to the bottom of the file
-    with open(tracker_file, mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        # Only write the header if the file was just created
-        if not file_exists:
-            writer.writerow(['Date', 'Job Title', 'Company', 'URL', 'Status'])
-        
-        # Write the new job row
-        writer.writerow([date_applied, job_title, company, job_url, "SIMULATED_SUCCESS"])
+    # 2. APPEND ENTRY: Write the row with your new customized columns
+    try:
+        with open(tracker_file, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            
+            # Define your custom column layout here
+            if is_new_file:
+                writer.writerow(['Date', 'Job Title', 'Company', 'URL', 'Location', 'ATS Score', 'Status'])
+            
+            # Log the corresponding data fields
+            writer.writerow([date_applied, job_title, company, job_url, location, ats_score, "SIMULATED_SUCCESS"])
+            
+        with open(tracker_file, mode='r', encoding='utf-8') as file:
+            total_rows = sum(1 for row in file) - 1
+            
+        print(f"✅ SUCCESS: Appended safely. Total unique records in tracker: {total_rows}")
+        return f"SUCCESS: Logged {job_title} at {company}. Total tracker rows: {total_rows}"
+    except Exception as e:
+        return f"FAILED to write entry: {str(e)}"
     
-    return f"VIRTUAL SUCCESS: New application logged in tracker."
 
 @CrewBase
 class MyLinkedinAutomation():

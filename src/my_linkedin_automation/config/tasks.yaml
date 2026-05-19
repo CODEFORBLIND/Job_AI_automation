@@ -11,7 +11,7 @@ research_job_task:
     5. If the search tool provides a shortened URL, keep searching until you find 
       the direct, clickable job link.
   expected_output: >
-    A list of exactly 2 jobs from Indeed or Naukri. For each job, provide:
+    A list of exactly 1 jobs from Indeed or Naukri. For each job, provide:
     - JOB_TITLE: [Title]
     - FULL_URL: [The complete, long URL from Indeed or Naukri]
     - COMPANY: [Company Name]
@@ -55,11 +55,19 @@ user_checkup_task:
 
 simulate_application_task:
   description: >
-    For each job approved by the user, use the 'execute_job_application' tool.
-    This logs the job to the 'applied_jobs_tracker.csv' without real submission.
-  expected_output: "All jobs recorded in the application tracker."
+    Review the single job role approved during the user checkup step. 
+    
+    Call the 'execute_job_application' tool EXACTLY ONCE for this job. 
+    Extract and pass the following arguments to the tool:
+    - job_title: The name of the engineering role
+    - company: The hiring organization's name
+    - job_url: The direct link string
+    - location: The geographic city location of the role
+    - ats_score: The calculated score percentage from the resume analyst stage
+  expected_output: "A success message confirming the single job was written to the CSV file."
   agent: automation_manager
   context:
     - user_checkup_task
     - research_job_task
+    - analyze_resume_task
 

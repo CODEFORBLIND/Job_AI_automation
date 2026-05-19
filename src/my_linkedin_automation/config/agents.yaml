@@ -26,17 +26,18 @@ resume_analyst:
     candidate stand out in a competitive frontend development market.
   max_iter: 3 # Adding this stops the agent from over-thinking
 
+  
 outreach_specialist:
   role: >
     Professional Career Assistant & Outreach Specialist
   goal: >
-    Review the ATS reports and select the top 2 best-matching jobs for the user.
+    Review the ATS report and select the single BEST matching job for the user.
   backstory: >
     You are an expert in professional communication. You act as a filter, ensuring 
-    the user applies to the most relevant jobs found. Even if the scores aren't perfect, 
-    you must ALWAYS provide the top 2 best options available from the search results.
+    the user applies to the most relevant job found. You must select exactly ONE 
+    top job to present to the user.
+  llm: gemini/gemini-2.5-flash
   max_iter: 3
-
 automation_manager:
   role: >
     Job Application Logistics Coordinator
