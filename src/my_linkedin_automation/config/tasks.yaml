@@ -71,3 +71,48 @@ simulate_application_task:
     - research_job_task
     - analyze_resume_task
 
+write_cover_letter_task:
+  description: >
+    Write a highly customized cover letter for the single job approved in the user_checkup_task.
+    
+    INSTRUCTIONS:
+    1. Read the exact job requirements from the research_job_task.
+    2. Read the candidate's skills and gaps from the analyze_resume_task.
+    3. Draft a professional, 3-paragraph cover letter addressing the hiring manager. 
+      Highlight the candidate's MCA background and frontend internship experience.
+    4. You MUST use the 'save_cover_letter' tool to save the document. 
+      Pass the company_name, job_title, and the full letter_content to the tool.
+  expected_output: "A success message confirming the cover letter was saved as a markdown file."
+  agent: cover_letter_writer
+  context:
+    - user_checkup_task
+    - research_job_task
+    - analyze_resume_task
+
+
+tailor_resume_task:
+  description: >
+    Create a highly customized, full-length Markdown resume for the single job approved in the user_checkup_task.
+    
+    INSTRUCTIONS:
+    1. Read the exact job requirements from the research_job_task.
+    2. Look at the candidate's FULL base experience evaluated in the analyze_resume_task.
+    3. Act as a precision editor. Keep 80% of the resume exactly the same. ONLY modify the 20% that matters for ATS scoring (specifically, the technical bullet points under Experience and Projects).
+    
+    STRICT PRESERVATION RULES:
+    - DO NOT summarize, condense, or shorten the document. The final output must be a full-length, detailed professional resume.
+    - PRESERVE EXACTLY: Name, MCA degree at SPPU, and Vice Chairperson role at ACM Student Chapter.
+    - PRESERVE EXACTLY: The company name 'ASD Cybersecurity' and the project names 'Scan-to-Shelf' and 'LinkedIn Automation Agent'. Do not alter these titles.
+    
+    ATS OPTIMIZATION RULES:
+    - Focus your alterations purely on the bullet points beneath the 'Scan-to-Shelf' and 'LinkedIn Automation Agent' projects.
+    - Rewrite those bullet points using the XYZ Formula: Accomplished [X] as measured by [Y], by doing [Z].
+    - Use strong action verbs (e.g., Engineered, Architected, Optimized).
+    - NEVER use fluffy AI jargon like "leveraged advanced techniques" or "demonstrating robust skills". Keep it technical, concise, and punchy.
+    - Format project headers exactly like this: **Project Name** | *Core Tech Used*
+  expected_output: "A success message confirming the full-length, ATS-optimized tailored resume was saved."
+  agent: resume_tailor
+  context:
+    - user_checkup_task
+    - research_job_task
+    - analyze_resume_task

@@ -120,6 +120,87 @@ def execute_job_application(job_title: str, company: str, job_url: str, location
         return f"FAILED to write entry: {str(e)}"
     
 
+@tool("save_cover_letter")
+def save_cover_letter(company_name: str, job_title: str, letter_content: str):
+    """Saves the generated cover letter to a local markdown file."""
+    import os
+    
+    # 1. Create a dedicated folder for cover letters if it doesn't exist
+    folder_name = "cover_letters"
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
+    # 2. Clean the company name so it's safe to use as a file name
+    clean_company = "".join(x for x in company_name if x.isalnum() or x in " _-").replace(" ", "_")
+    clean_title = "".join(x for x in job_title if x.isalnum() or x in " _-").replace(" ", "_")
+    filename = f"{folder_name}/{clean_company}_{clean_title}_CoverLetter.md"
+    
+    # 3. Save the actual text to the file
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(letter_content)
+    
+    print(f"📄 SUCCESS: Custom Cover Letter saved as {filename}")
+    return f"SUCCESS: Cover letter saved locally as {filename}"
+
+
+@tool("save_tailored_resume")
+def save_tailored_resume(company_name: str, resume_content: str):
+    """Saves the tailored resume to a local markdown file AND converts it to a professional PDF."""
+    import os
+    import markdown
+    from xhtml2pdf import pisa
+    
+    # 1. Create a dedicated folder for tailored resumes
+    folder_name = "tailored_resumes"
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
+    # 2. Clean the company name for the file path
+    clean_company = "".join(x for x in company_name if x.isalnum() or x in " _-").replace(" ", "_")
+    md_filename = f"{folder_name}/Chelsi_Jain_{clean_company}_Resume.md"
+    pdf_filename = f"{folder_name}/Chelsi_Jain_{clean_company}_Resume.pdf"
+    
+    # 3. Save the Markdown file (as a backup)
+    with open(md_filename, 'w', encoding='utf-8') as f:
+        f.write(resume_content)
+    
+    # 4. Convert Markdown to HTML
+    # We add basic CSS styling to make the PDF look like a real resume
+    html_content = markdown.markdown(resume_content)
+    styled_html = f"""
+    <html>
+    <head>
+        <style>
+            @page {{ size: a4 portrait; margin: 2cm; }}
+            body {{ font-family: Helvetica, Arial, sans-serif; font-size: 12pt; color: #333; }}
+            h1 {{ font-size: 24pt; color: #2c3e50; text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 5px; }}
+            h2 {{ font-size: 16pt; color: #34495e; margin-top: 20px; border-bottom: 1px solid #ccc; }}
+            ul {{ margin-bottom: 15px; }}
+            li {{ margin-bottom: 5px; line-height: 1.4; }}
+        </style>
+    </head>
+    <body>
+        {html_content}
+    </body>
+    </html>
+    """
+    
+    # 5. Convert HTML to PDF using xhtml2pdf
+    try:
+        with open(pdf_filename, "w+b") as pdf_file:
+            pisa_status = pisa.CreatePDF(styled_html, dest=pdf_file)
+            
+        if pisa_status.err:
+            print(f"⚠️ Warning: PDF generated with some errors for {clean_company}")
+        else:
+            print(f"📄 SUCCESS: Markdown AND PDF Resume saved for {clean_company}!")
+            
+    except Exception as e:
+        print(f"❌ Error generating PDF: {e}")
+        return f"Saved MD, but failed to generate PDF: {e}"
+        
+    return f"SUCCESS: Resume saved locally as {pdf_filename}"
+
 @CrewBase
 class MyLinkedinAutomation():
     """MyLinkedinAutomation crew optimized for efficiency"""
@@ -165,6 +246,40 @@ class MyLinkedinAutomation():
             allow_delegation=False,
             step_callback=lambda step: time.sleep(5)
         )
+    
+    @agent
+    def cover_letter_writer(self) -> Agent:
+        return Agent(
+            config=self.agents_config['cover_letter_writer'],
+            tools=[save_cover_letter], # Give it the new tool!
+            verbose=True,
+            allow_delegation=False,
+            step_callback=lambda step: time.sleep(5)
+        )
+    
+    @agent
+    def resume_tailor(self) -> Agent:
+        return Agent(
+            config=self.agents_config['resume_tailor'],
+            tools=[save_tailored_resume], 
+            verbose=True,
+            allow_delegation=False,
+            step_callback=lambda step: time.sleep(5)
+        )
+    
+    @task
+    def tailor_resume_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['tailor_resume_task'],
+            context=[self.user_checkup_task(), self.research_job_task(), self.analyze_resume_task()]
+        )
+    
+    @task
+    def write_cover_letter_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['write_cover_letter_task'],
+            context=[self.user_checkup_task(), self.research_job_task(), self.analyze_resume_task()]
+        )
 
     @task
     def research_job_task(self) -> Task:
@@ -204,7 +319,15 @@ class MyLinkedinAutomation():
     def crew(self) -> Crew:
         return Crew(
             agents=self.agents, 
-            tasks=self.tasks, 
+            tasks=[
+                self.research_job_task(),
+                self.analyze_resume_task(),
+                self.outreach_task(),
+                self.user_checkup_task(),
+                self.simulate_application_task(),
+                self.write_cover_letter_task(),
+                self.tailor_resume_task()
+            ], 
             process=Process.sequential,
             verbose=True,
             max_rpm=1,
