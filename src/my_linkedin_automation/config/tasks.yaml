@@ -92,27 +92,51 @@ write_cover_letter_task:
 
 tailor_resume_task:
   description: >
-    Create a highly customized, full-length Markdown resume for the single job approved in the user_checkup_task.
+    Create a highly customized, full-length Markdown resume based on the job requirements found in the research_job_task.
+    
+    BASE RESUME TO EDIT:
+    # Chelsi Jain
+    Frontend Web Developer & MCA Student<br>
+    Pune, India | your.email@sppu.edu | github.com/yourusername | linkedin.com/in/yourusername
+
+    ## Education
+    * **Master of Computer Applications (MCA)** - Savitribai Phule Pune University (SPPU)
+    * Vice Chairperson, ACM Student Chapter
+
+    ## Experience
+    **Cybersecurity Intern** | ASD Cybersecurity
+    * Conducted vulnerability assessments and penetration testing on 15+ web applications.
+    * Monitored network traffic for suspicious activities and drafted daily security reports, reducing incident response time by 20%.
+
+    ## Projects
+    **Scan-to-Shelf Kitchen Manager**
+    * Developed a web application using React.js for 50+ test users.
+    * Integrated Vision AI to scan grocery receipts with 95% accuracy.
+
+    **LinkedIn Automation Agent**
+    * Built an automation script using Python, saving 10 hours of manual work per week.
+    * Used CrewAI to organize data into modular pipelines.
+
+    ## Skills
+    * **Languages:** Python, C++, JavaScript, TypeScript
+    * **Frameworks:** React.js, Tailwind CSS, Node.js
+    * **Tools:** Git, n8n, CrewAI, Linux
     
     INSTRUCTIONS:
-    1. Read the exact job requirements from the research_job_task.
-    2. Look at the candidate's FULL base experience evaluated in the analyze_resume_task.
-    3. Act as a precision editor. Keep 80% of the resume exactly the same. ONLY modify the 20% that matters for ATS scoring (specifically, the technical bullet points under Experience and Projects).
+    1. Act as a precision editor. Keep 80% of the resume exactly the same. ONLY modify the bullet points under 'Projects'.
     
     STRICT PRESERVATION RULES:
-    - DO NOT summarize, condense, or shorten the document. The final output must be a full-length, detailed professional resume.
-    - PRESERVE EXACTLY: Name, MCA degree at SPPU, and Vice Chairperson role at ACM Student Chapter.
-    - PRESERVE EXACTLY: The company name 'ASD Cybersecurity' and the project names 'Scan-to-Shelf' and 'LinkedIn Automation Agent'. Do not alter these titles.
+    - DO NOT summarize or shorten the document.
+    - PRESERVE EXACTLY: Header block (Name, Email, Links), Education block, and the Skills block at the bottom. Do not delete the Skills section!
+    - PRESERVE EXACTLY: The company name 'ASD Cybersecurity' and its exact bullet points.
     
     ATS OPTIMIZATION RULES:
     - Focus your alterations purely on the bullet points beneath the 'Scan-to-Shelf' and 'LinkedIn Automation Agent' projects.
-    - Rewrite those bullet points using the XYZ Formula: Accomplished [X] as measured by [Y], by doing [Z].
-    - Use strong action verbs (e.g., Engineered, Architected, Optimized).
-    - NEVER use fluffy AI jargon like "leveraged advanced techniques" or "demonstrating robust skills". Keep it technical, concise, and punchy.
-    - Format project headers exactly like this: **Project Name** | *Core Tech Used*
-  expected_output: "A success message confirming the full-length, ATS-optimized tailored resume was saved."
+    - Rewrite those bullet points to naturally inject the technical keywords requested by the employer (from the research_job_task).
+    - ANTI-FLUFF MANDATE: Do NOT use filler phrases. Write punchy, highly technical sentences.
+    - Keep all hard metrics (numbers, percentages, hours) completely intact.
+    - Use the 'save_tailored_resume' tool to save the file. Pass the target company_name and the full markdown text.
+  expected_output: "A success message confirming the tailored resume was saved."
   agent: resume_tailor
   context:
-    - user_checkup_task
     - research_job_task
-    - analyze_resume_task

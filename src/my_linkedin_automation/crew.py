@@ -201,6 +201,52 @@ def save_tailored_resume(company_name: str, resume_content: str):
         
     return f"SUCCESS: Resume saved locally as {pdf_filename}"
 
+@tool("save_tailored_resume")
+def save_tailored_resume(company_name: str, resume_content: str):
+    """Saves the tailored resume to Markdown and PDF."""
+    import os
+    import markdown
+    from xhtml2pdf import pisa
+
+    folder_name = "tailored_resumes"
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
+    clean_company = "".join(x for x in company_name if x.isalnum() or x in " _-").replace(" ", "_")
+    md_filename = f"{folder_name}/Chelsi_Jain_{clean_company}_Resume.md"
+    pdf_filename = f"{folder_name}/Chelsi_Jain_{clean_company}_Resume.pdf"
+    
+    with open(md_filename, 'w', encoding='utf-8') as f:
+        f.write(resume_content)
+    
+    html_content = markdown.markdown(resume_content)
+    styled_html = f"""
+    <html>
+    <head>
+        <style>
+            @page {{ size: a4 portrait; margin: 1.5cm; }}
+            body {{ font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #222; line-height: 1.4; }}
+            h1 {{ font-size: 24pt; color: #000; text-align: center; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }}
+            p.subtitle {{ text-align: center; font-size: 11pt; color: #555; margin-top: 0px; margin-bottom: 15px; }}
+            h2 {{ font-size: 13pt; color: #000; border-bottom: 1px solid #000; padding-bottom: 4px; margin-top: 15px; margin-bottom: 10px; text-transform: uppercase; }}
+            ul {{ margin-top: 5px; margin-bottom: 15px; padding-left: 20px; }}
+            li {{ margin-bottom: 5px; text-align: justify; }}
+            strong {{ color: #000; font-weight: bold; }}
+            em {{ color: #444; font-style: italic; }}
+        </style>
+    </head>
+    <body>
+        {html_content}
+    </body>
+    </html>
+    """
+    
+    with open(pdf_filename, "w+b") as pdf_file:
+        pisa.CreatePDF(styled_html, dest=pdf_file)
+            
+    print(f"📄 SUCCESS: Tailored Resume saved for {clean_company}")
+    return f"SUCCESS: Saved as {pdf_filename}"
+
 @CrewBase
 class MyLinkedinAutomation():
     """MyLinkedinAutomation crew optimized for efficiency"""
@@ -263,8 +309,14 @@ class MyLinkedinAutomation():
             config=self.agents_config['resume_tailor'],
             tools=[save_tailored_resume], 
             verbose=True,
-            allow_delegation=False,
-            step_callback=lambda step: time.sleep(5)
+            allow_delegation=False
+        )
+    
+    @task
+    def tailor_resume_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['tailor_resume_task'],
+            context=[self.research_job_task()] # Gives it the job requirements
         )
     
     @task
