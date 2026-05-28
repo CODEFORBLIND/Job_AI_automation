@@ -320,13 +320,6 @@ class MyLinkedinAutomation():
         )
     
     @task
-    def tailor_resume_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['tailor_resume_task'],
-            context=[self.user_checkup_task(), self.research_job_task(), self.analyze_resume_task()]
-        )
-    
-    @task
     def write_cover_letter_task(self) -> Task:
         return Task(
             config=self.tasks_config['write_cover_letter_task'],
